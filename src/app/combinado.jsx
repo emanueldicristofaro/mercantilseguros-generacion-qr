@@ -23,6 +23,9 @@ export default function Combinado () {
     const [zonas, setZonas] = useState([])
     const [zonasMap, setZonasMap] = useState([])
 
+    const [cambiarTextoEstado, setCambiarTextoEstado] = useState('')
+    const [cambiarTextoMunicipio, setCambiarTextoMunicipio] = useState('')
+
     const [isLoading, setIsLoading] = useState(false)
 
     /**SERVICES */
@@ -84,8 +87,12 @@ export default function Combinado () {
       let param = 'E'
       
       if (object !== undefined && object.gid[0] === 'PAN') {
+        setCambiarTextoEstado('Provincias')
+        setCambiarTextoMunicipio('Corregimientos')
         getTerritorialService(ID_COUNTRY_PANAMA, param)
-      } else if (object !== undefined && object.gid[0] === 'VEN') {
+      } else {
+        setCambiarTextoEstado('Estados')
+        setCambiarTextoMunicipio('Municipios')
         getTerritorialService(ID_COUNTRY_VENEZUELA, param)
       }
     }
@@ -178,43 +185,47 @@ export default function Combinado () {
             <Spinner state={isLoading}></Spinner>
             <div className="bg-gray-100 border border-gray-400 w-full sm:w-[50%] h-auto mt-10 rounded-xl shadow-md">
                 <div className="p-4 mt-2 text-blue-600 font-bold"><h3>Cotizador Combinado Residencial</h3></div>
-                <div className="p-4 mt-2 text-black text-sm"><p>Por favor, ingrese los siguientes datos para cotizar el seguro de su propiedad:</p></div>
+                <div className="p-4 mt-2 text-black text-sm"><p>Datos de propiedad</p></div>
                 <div className="p-4 mt-1 flex flex-wrap">
                     <div className="w-full sm:w-1/2 mb-2 sm:pr-2">
                         <div className="p-4">
-                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estados</label>
+                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">{cambiarTextoEstado}</label>
                             <Select 
                             onChange={handleSelectChangeEstado}
-                            options={estadosMap} />
+                            options={estadosMap}
+                            placeholder="Seleccione" />
                         </div>
                     </div>
                     <div className="w-full sm:w-1/2 mb-2 sm:pl-2">
                         <div className="p-4">
-                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Municipios</label>
+                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">{cambiarTextoMunicipio}</label>
                             <Select 
                             onChange={handleSelectChangeMunicipio}
-                            options={municipiosMap} />
+                            options={municipiosMap}
+                            placeholder="Seleccione" />
                         </div>
                     </div>
                     <div className="w-full sm:w-1/2 mb-2 sm:pr-2">
                         <div className="p-4">
-                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ciudades</label>
+                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Ciudades</label>
                             <Select 
                             onChange={handleSelectChangeCiudad}
-                            options={ciudadesMap} />
+                            options={ciudadesMap}
+                            placeholder="Seleccione" />
                         </div>
                     </div>
                     <div className="w-full sm:w-1/2 mb-2 sm:pl-2">
                         <div className="p-4">
-                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Zonas</label>
+                            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Zonas</label>
                             <Select 
                             onChange={handleSelectChangeZona}
-                            options={zonasMap} />
+                            options={zonasMap}
+                            placeholder="Seleccione" />
                         </div>
                     </div>
                     <div className="w-full">
-                        <label className="block mt-2 mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre del conjunto residencial</label>
-                        <input type="text" className="block w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg" placeholder="Ingrese nombre del conjunto residencial" onChange={handleInputConjuntoResidencial}/>   
+                        <label className="block mt-2 mb-2 text-sm font-medium text-gray-900 dark:text-black">Nombre del conjunto residencial</label>
+                        <input type="text" className="block w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg" placeholder="Ingrese nombre del conjunto residencial" maxlength="255" onChange={handleInputConjuntoResidencial}/>   
                     </div>
                 </div>
             </div>

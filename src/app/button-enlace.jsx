@@ -19,47 +19,86 @@ export default function ButtonGenerarEnlace () {
         })
     }
 
+    const parseURLParams = (url) => {
+
+        let queryStart = url.indexOf("?") + 1,
+            queryEnd   = url.indexOf("#") + 1 || url.length + 1,
+            query = url.slice(queryStart, queryEnd - 1),
+            pairs = query.replace(/\+/g, " ").split("&"),
+            parms = {}, i, n, v, nv
+    
+        if (query === url || query === "") return
+    
+        for (i = 0; i < pairs.length; i++) {
+            nv = pairs[i].split("=", 2)
+            n = decodeURIComponent(nv[0])
+            v = decodeURIComponent(nv[1])
+    
+            if (!parms.hasOwnProperty(n)) parms[n] = []
+            parms[n].push(nv.length === 2 ? v : null)
+        }
+        return parms
+    }
+
+    const generateParamsUrl = (url, object) => {
+        
+        if(sessionStorage.getItem("titulo") !== null){
+            url = url + `nombreresidencia=${sessionStorage.getItem("titulo")}&`
+        }
+        
+        if (sessionStorage.getItem('direccion') !== null) {
+            url = url + `direccion=${sessionStorage.getItem('direccion')}&`
+        }
+        
+        if (sessionStorage.getItem('estadoId') !== null) {
+            let cambiarTexto = object !== undefined ? `provincia=${sessionStorage.getItem('estadoId')}&` : `estado=${sessionStorage.getItem('estadoId')}&`
+            url = url + cambiarTexto
+        }
+
+        if (sessionStorage.getItem('municipioId') !== null) {
+            let cambiarTexto = object !== undefined ? `corregimiento=${sessionStorage.getItem('municipioId')}&` : `municipio=${sessionStorage.getItem('municipioId')}&`
+            url = url + cambiarTexto
+        }
+
+        if (sessionStorage.getItem('ciudadId') !== null) {
+            url = url + `ciudad=${sessionStorage.getItem('ciudadId')}&`
+        }
+        
+        if (sessionStorage.getItem('zonaId') !== null) {
+            url = url + `zona=${sessionStorage.getItem('zonaId')}&`
+        }
+        
+        if (sessionStorage.getItem("conjunto") !== null) {
+            url = url + `nombre=${sessionStorage.getItem("conjunto")}&`
+        }
+
+        url = url + `nombreasesor=${sessionStorage.getItem('asesorNombre')}&` +
+        `cdmediador=${sessionStorage.getItem('asesorId')}`
+        setBody(url)
+    }
+
     const handleClickButton = (value) => {
+
+        let object = parseURLParams(window.location.href)
 
         if(sessionStorage.getItem('asesorId') === null){
            setTitle('Error')
            setBody('Debe seleccionar un asesor') 
-        } else if (sessionStorage.getItem('estadoId') === null){
+        } else if (sessionStorage.getItem('estadoId') !== null && sessionStorage.getItem('municipioId') === null){
             setTitle('Error')
-            setBody('Debe seleccionar un estado')
-        } else if (sessionStorage.getItem('municipioId') === null){
-            setTitle('Error')
-            setBody('Debe seleccionar un municipio')
-        } else if (sessionStorage.getItem('ciudadId') === null){
+            let cambiarTexto = object !== undefined ? 'corregimiento' : 'municipio'
+            setBody('Debe seleccionar un ' + cambiarTexto)
+        } else if (sessionStorage.getItem('municipioId') !== null && sessionStorage.getItem('ciudadId') === null){
             setTitle('Error')
             setBody('Debe seleccionar una ciudad')
-        } else if (sessionStorage.getItem('zonaId') === null){
+        } else if (sessionStorage.getItem('ciudadId') !== null && sessionStorage.getItem('zonaId') === null){
             setTitle('Error')
             setBody('Debe seleccionar una zona')
-        } else if (sessionStorage.getItem('conjunto') === null){
-            setTitle('Error')
-            setBody('Debe indicar su conjunto residencial')
-        } else if (sessionStorage.getItem('titulo') === null){
-            setTitle('Error')
-            setBody('Debe indicar el título de propiedad')
-        } else if (sessionStorage.getItem('direccion') === null){
-            setTitle('Error')
-            setBody('Debe indicar la dirección')
-        } else {
+        } else { 
             setShowButton(true)
             setTitle('Confirmación')
-            let url = `https://formularios.mercantilseguros.com/` +
-            `combinado-residencial-b3446ba5098f?` +
-            `nombreresidencia=${sessionStorage.getItem("titulo")}&` +
-            `direccion=${sessionStorage.getItem('direccion')}&` +
-            `nombreasesor=${sessionStorage.getItem('asesorNombre')}&` +
-            `estado=${sessionStorage.getItem('estadoId')}&` +
-            `municipio=${sessionStorage.getItem('municipioId')}&` +
-            `ciudad=${sessionStorage.getItem('ciudadId')}&` +
-            `zona=${sessionStorage.getItem('zonaId')}&` +
-            `nombre=${sessionStorage.getItem("conjunto")}&` +
-            `cdmediador=${sessionStorage.getItem('asesorId')}`
-            setBody(url)
+            let url = object !== undefined ? `https://mercantil-seguros.involve.me/combinado-residencial-pty?` : `https://formularios.mercantilseguros.com/combinado-residencial-b3446ba5098f?`
+            generateParamsUrl(url, object)
         }
         setShowModal(value)
     }
@@ -89,7 +128,7 @@ export default function ButtonGenerarEnlace () {
             </Modal>
             <button type="button" className="w-96 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             onClick={handleClickButton}
-            >Generar enlace</button>
+            >Generar QR</button>
         </div>
     )
 }

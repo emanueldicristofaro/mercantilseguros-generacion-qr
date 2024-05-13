@@ -10,6 +10,8 @@ export default function Asesores () {
     const [asesoresMap, setAsesoresMap] = useState([])
     const [selectedOption, setSelectedOption] = useState()
     const [isLoading, setIsLoading] = useState(false)
+    const [disabledAsesores, setDisableAsesores] = useState(false)
+    const [uniqueAsesor, setUniqueAsesor] = useState('')
 
     const getAsesoresVenezuela = async () => {
 
@@ -85,7 +87,7 @@ export default function Asesores () {
 
       if (object !== undefined && object.gid[0] === 'PAN') {
         getAsesoresPanama()
-      } else if (object !== undefined && object.gid[0] === 'VEN') {
+      } else {
         getAsesoresVenezuela()
       }   
     }
@@ -94,6 +96,14 @@ export default function Asesores () {
         setSelectedOption(selected.value)
         sessionStorage.setItem('asesorId', selected.value.codigoAds)
         sessionStorage.setItem('asesorNombre', selected.value.nombreAds)
+    }
+
+    const handleUniqueAsesor = (object) => {
+      setDisableAsesores(true)
+      let asesorUniqueTemp = asesores.filter(a => a.codigoAds === object.cdMediador[0])
+      sessionStorage.setItem('asesorId', object.cdMediador[0])
+      sessionStorage.setItem('asesorNombre', asesorUniqueTemp[0]?.nombreAds)
+      setUniqueAsesor(asesorUniqueTemp[0]?.codigoAds + ' - ' + asesorUniqueTemp[0]?.nombreAds)
     }
 
     useEffect(() => {
@@ -110,12 +120,12 @@ export default function Asesores () {
             asesoresPanama.map((a) => {
               asesoresTemp.push({ value: { codigoAds: a.codigoAds, nombreAds: a.nombreAds }, label: a.codigoAds + '-' + a.nombreAds })
             })
-          } else if(object !== undefined && object.gid[0] === 'VEN'){
+            if(object.cdMediador !== undefined) handleUniqueAsesor(object)
+          } else {
             asesores.map((a) => {
               asesoresTemp.push({ value: { codigoAds: a.codigoAds, nombreAds: a.nombreAds }, label: a.codigoAds + '-' + a.nombreAds })
             })
-          } else {
-            alert("Error no se ha indicado un parámetro")  
+            if(object !== undefined) handleUniqueAsesor(object)
           }
           setAsesoresMap(asesoresTemp)
         }
@@ -126,13 +136,19 @@ export default function Asesores () {
         <div id="asesores" className="flex justify-center">
           <Spinner state={isLoading}></Spinner>
             <div className="bg-gray-100 border border-gray-400 w-full sm:w-[50%] h-auto mt-24 rounded-xl shadow-md">
-                <div className="p-4 mt-2 text-blue-600 font-bold"><h3>Datos del registro</h3></div>
-                <div className="p-4">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Asesores</label>
+                <div className="p-4 mt-2 text-blue-600 font-bold"><h3>Indica los datos para generar tu QR personalizado</h3></div>
+                {!disabledAsesores ? <div className="p-4">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Asesores</label>
                     <Select 
                     onChange={handleSelectChange}
-                    options={asesoresMap} />
-                </div>
+                    options={asesoresMap}
+                    placeholder="Seleccione"/>
+                </div> :
+                  <div className="p-4">
+                    <label className="block mt-2 mb-2 text-sm font-medium text-gray-900 dark:text-black">Asesor</label>
+                    <input type="text" className="block w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg" value={uniqueAsesor} disabled/>
+                  </div>
+                } 
             </div>
         </div>
     )
