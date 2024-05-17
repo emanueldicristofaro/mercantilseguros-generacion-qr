@@ -136,7 +136,7 @@ export default function Asesores () {
         <div id="asesores" className="flex justify-center">
           <Spinner state={isLoading}></Spinner>
             <div className="bg-gray-100 border border-gray-400 w-full sm:w-[50%] h-auto mt-24 rounded-xl shadow-md">
-                <div className="p-4 mt-2 text-blue-600 font-bold"><h3>Indica los datos para generar tu QR personalizado</h3></div>
+                <div className="p-4 mt-2 text-gray-800 font-bold"><h3>Indica los datos para generar tu QR personalizado</h3></div>
                 {!disabledAsesores ? <div className="p-4">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Asesores</label>
                     <Select 

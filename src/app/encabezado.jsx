@@ -17,7 +17,7 @@ export default function Encabezado () {
     return (
         <div id="encabezado" className="flex justify-center">
             <div className="bg-gray-100 border border-gray-400 w-full sm:w-[50%] h-auto mt-10 rounded-xl shadow-md">
-            <div className="p-4 mt-2 text-blue-600 font-bold"><h3>Otros datos</h3></div>
+            <div className="p-4 mt-2 text-gray-800 font-bold"><h3>Otros datos</h3></div>
                 <div className="p-4 mt-1">
                     <div className="mb-2">
                         <label className="block mt-2 mb-2 text-sm font-medium text-gray-900 dark:text-black">Título de propiedad</label>

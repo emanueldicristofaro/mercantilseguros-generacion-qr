@@ -184,7 +184,7 @@ export default function Combinado () {
         <div id="combinado" className="flex justify-center">
             <Spinner state={isLoading}></Spinner>
             <div className="bg-gray-100 border border-gray-400 w-full sm:w-[50%] h-auto mt-10 rounded-xl shadow-md">
-                <div className="p-4 mt-2 text-blue-600 font-bold"><h3>Cotizador Combinado Residencial</h3></div>
+                <div className="p-4 mt-2 text-gray-800 font-bold"><h3>Cotizador Combinado Residencial</h3></div>
                 <div className="p-4 mt-2 text-black text-sm"><p>Datos de propiedad</p></div>
                 <div className="p-4 mt-1 flex flex-wrap">
                     <div className="w-full sm:w-1/2 mb-2 sm:pr-2">

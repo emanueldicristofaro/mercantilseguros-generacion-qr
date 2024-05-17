@@ -8,6 +8,7 @@ export default function ButtonGenerarEnlace () {
     const [showButton, setShowButton] = useState(false)
     const [title, setTitle] = useState('')
     const [body, setBody] = useState('')
+    const [imagen, setImagen] = useState(null)
 
     const handleClickButtonCopy = () => {
         navigator.clipboard.writeText(body)
@@ -40,6 +41,52 @@ export default function ButtonGenerarEnlace () {
         return parms
     }
 
+    const generateQR = (data) => {
+
+        const options = {
+            method: 'POST',
+            headers: {
+              accept: 'image/png',
+              'content-type': 'application/json',
+              Authorization: 'sk_ZC8BOfieVfdxTtKy'
+            },
+            body: JSON.stringify({type: 'png', size: 100, color: '000000', backgroundColor: 'ffffff'})
+          }
+          
+          fetch('https://api.short.io/links/qr/' + data.idString, options)
+          .then(response => {
+            if (response.status === 201) {
+              return response.blob()
+            } else {
+              throw new Error('Error en la petición')
+            }
+          })
+          .then(blob => {
+            const url = URL.createObjectURL(blob)
+            setImagen(url)
+          })
+            .then(response => console.log(response))
+            .catch(err => console.error(err))
+    }
+
+    const generateShortLink = (url) => {
+
+        const options = {
+            method: 'POST',
+            headers: {
+              accept: 'application/json',
+              'content-type': 'application/json',
+              Authorization: 'sk_ZC8BOfieVfdxTtKy'
+            },
+            body: JSON.stringify({domain: 'emih.short.gy', originalURL: url})
+          }
+          
+          fetch('https://api.short.io/links', options)
+            .then(response => response.json())
+            .then(response => generateQR(response))
+            .catch(err => console.error(err))  
+    }
+
     const generateParamsUrl = (url, object) => {
         
         if(sessionStorage.getItem("titulo") !== null){
@@ -51,13 +98,11 @@ export default function ButtonGenerarEnlace () {
         }
         
         if (sessionStorage.getItem('estadoId') !== null) {
-            let cambiarTexto = object !== undefined ? `provincia=${sessionStorage.getItem('estadoId')}&` : `estado=${sessionStorage.getItem('estadoId')}&`
-            url = url + cambiarTexto
+            url = url + `estado=${sessionStorage.getItem('estadoId')}&`
         }
 
         if (sessionStorage.getItem('municipioId') !== null) {
-            let cambiarTexto = object !== undefined ? `corregimiento=${sessionStorage.getItem('municipioId')}&` : `municipio=${sessionStorage.getItem('municipioId')}&`
-            url = url + cambiarTexto
+            url = url + `municipio=${sessionStorage.getItem('municipioId')}&`
         }
 
         if (sessionStorage.getItem('ciudadId') !== null) {
@@ -75,6 +120,19 @@ export default function ButtonGenerarEnlace () {
         url = url + `nombreasesor=${sessionStorage.getItem('asesorNombre')}&` +
         `cdmediador=${sessionStorage.getItem('asesorId')}`
         setBody(url)
+        generateShortLink(url)
+    }
+
+    const descargarImagen = () => {
+
+        if (imagen) {
+            const link = document.createElement('a')
+            link.href = imagen
+            link.download = 'qr.png'
+            document.body.appendChild(link)
+            link.click();
+            document.body.removeChild(link)
+          }
     }
 
     const handleClickButton = (value) => {
@@ -105,7 +163,10 @@ export default function ButtonGenerarEnlace () {
 
     return (
         <div id="generarEnlace" className="flex justify-center">
-            <Modal title={title} isVisible={showModal} onClose={() => setShowModal(false)}>
+            <Modal title={title} isVisible={showModal} onClose={() => {
+                setShowModal(false)
+                sessionStorage.clear()
+            }}>
             <div className="flex items-center">
                 <div className="w-full p-5">
                     <input
@@ -118,15 +179,27 @@ export default function ButtonGenerarEnlace () {
                 {showButton ? (
                     <button
                         type="button"
-                        className="w-[25%] text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                        className="w-[25%] text-white bg-gray-800 hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-800 focus:outline-none dark:focus:ring-blue-800"
                         onClick={handleClickButtonCopy}
                     >
                         Copiar
                     </button>
-                ) : (<div></div>)}
-                </div>
+                ) : (<div></div>)}    
+            </div>
+            <div className="flex justify-center mt-5 mb-5">
+                {imagen && <img src={imagen} width={150} height={150} alt="Imagen generada" />}
+            </div>
+            <div className="flex justify-center mt-5 mb-5">
+                <button
+                    type="button"
+                    className="w-[25%] text-white bg-gray-800 hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-800 focus:outline-none dark:focus:ring-blue-800"
+                    onClick={descargarImagen}
+                >
+                    Descargar
+                </button>
+            </div>
             </Modal>
-            <button type="button" className="w-96 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            <button type="button" className="w-96 text-white bg-gray-800 hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-10 dark:bg-gray-800 dark:hover:bg-gray-800 focus:outline-none dark:focus:ring-blue-800"
             onClick={handleClickButton}
             >Generar QR</button>
         </div>
